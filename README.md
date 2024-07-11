@@ -1,3 +1,3 @@
 # Pocket Framework
 
-A micro framework.
+A PHP micro framework
