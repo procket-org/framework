@@ -1,0 +1,55 @@
+{
+  "name": "pocket/framework",
+  "description": "The Pocket Framework.",
+  "keywords": [
+    "pocket framework",
+    "micro framework"
+  ],
+  "license": "MIT",
+  "require": {
+    "php": "^8.2",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^7.8",
+    "illuminate/config": "^11.0",
+    "illuminate/database": "^11.0",
+    "illuminate/events": "^11.0",
+    "illuminate/filesystem": "^11.0",
+    "illuminate/http": "^11.0",
+    "illuminate/pagination": "^11.0",
+    "illuminate/translation": "^11.0",
+    "illuminate/validation": "^11.0",
+    "league/flysystem": "^3.0",
+    "league/flysystem-aws-s3-v3": "^3.0",
+    "monolog/monolog": "^3.7",
+    "predis/predis": "^2.2",
+    "symfony/cache": "^7.1",
+    "symfony/console": "^7.1",
+    "symfony/filesystem": "^7.1",
+    "symfony/lock": "^7.1",
+    "twig/twig": "^3.10",
+    "vlucas/phpdotenv": "^5.6"
+  },
+  "require-dev": {
+    "league/flysystem-ftp": "^3.0",
+    "league/flysystem-sftp-v3": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pocket\\Framework\\": "src/"
+    },
+    "files": [
+      "src/constants.php",
+      "src/helpers.php"
+    ]
+  },
+  "suggest": {
+    "ext-ftp": "Required to use the Flysystem FTP driver.",
+    "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^2.4).",
+    "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^2.5)."
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  }
+}
