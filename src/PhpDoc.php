@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework;
+namespace Procket\Framework;
 
 /**
  * Simple php document parser

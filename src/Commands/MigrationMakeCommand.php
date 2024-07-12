@@ -1,13 +1,13 @@
 <?php
 
-namespace Pocket\Framework\Commands;
+namespace Procket\Framework\Commands;
 
 use Exception;
 use Illuminate\Database\Console\Migrations\TableGuesser;
 use Illuminate\Support\Str;
-use Pocket\Framework\Database\Migration\MigrationBaseCommand;
-use Pocket\Framework\Database\Migration\MigrationCreator;
-use Pocket\Framework\Pocket;
+use Procket\Framework\Database\Migration\MigrationBaseCommand;
+use Procket\Framework\Database\Migration\MigrationCreator;
+use Procket\Framework\Procket;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -108,7 +108,7 @@ class MigrationMakeCommand extends MigrationBaseCommand
         }
 
         $migrationCreator = new MigrationCreator(
-            Pocket::instance()->getFilesystem(),
+            Procket::instance()->getFilesystem(),
             $this->getMigrationCreatorOptions()
         );
         $createdFile = $migrationCreator->create(

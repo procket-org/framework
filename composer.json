@@ -1,9 +1,10 @@
 {
-  "name": "pocket/framework",
-  "description": "The Pocket Framework.",
+  "name": "procket/framework",
+  "description": "The Procket Framework.",
   "keywords": [
-    "pocket framework",
-    "micro framework"
+    "procket framework",
+    "micro framework",
+    "PHP pocket rocket"
   ],
   "license": "MIT",
   "require": {
@@ -35,7 +36,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Pocket\\Framework\\": "src/"
+      "Procket\\Framework\\": "src/"
     },
     "files": [
       "src/constants.php",

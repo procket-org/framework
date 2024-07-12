@@ -1,10 +1,10 @@
 <?php
 
-namespace Pocket\Framework\Database\Migration;
+namespace Procket\Framework\Database\Migration;
 
 use Illuminate\Database\Migrations\Migration as BaseMigration;
 use Illuminate\Database\Schema\Builder as DbSchemaBuilder;
-use Pocket\Framework\Pocket;
+use Procket\Framework\Procket;
 
 /**
  * Migration base class
@@ -18,8 +18,8 @@ abstract class Migration extends BaseMigration implements MigrationInterface
      */
     public function schema(): DbSchemaBuilder
     {
-        $connection = $this->connection ?: Pocket::instance()->defaultDbConnection;
+        $connection = $this->connection ?: Procket::instance()->defaultDbConnection;
 
-        return Pocket::instance()->getDbSchema($connection);
+        return Procket::instance()->getDbSchema($connection);
     }
 }

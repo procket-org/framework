@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework;
+namespace Procket\Framework;
 
 use ArrayObject;
 use Illuminate\Contracts\Support\Arrayable;

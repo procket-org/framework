@@ -1,10 +1,10 @@
 <?php
 
-namespace Pocket\Framework\Commands;
+namespace Procket\Framework\Commands;
 
 use Exception;
-use Pocket\Framework\Database\Migration\MigrationBaseCommand;
-use Pocket\Framework\Pocket;
+use Procket\Framework\Database\Migration\MigrationBaseCommand;
+use Procket\Framework\Procket;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -29,7 +29,7 @@ class MigrationRefreshCommand extends MigrationBaseCommand
             null,
             InputOption::VALUE_REQUIRED,
             'The database connection to use',
-            Pocket::instance()->defaultDbConnection
+            Procket::instance()->defaultDbConnection
         )->addOption(
             'step',
             null,
@@ -70,7 +70,7 @@ class MigrationRefreshCommand extends MigrationBaseCommand
      */
     protected function runRollback(InputInterface $input, OutputInterface $output): void
     {
-        $command = Pocket::instance()->getConsoleApp()->find('migration:rollback');
+        $command = Procket::instance()->getConsoleApp()->find('migration:rollback');
         $arguments = array_filter([
             '--database' => $input->getOption('database'),
             '--step' => $input->getOption('step') ?: 0
@@ -89,7 +89,7 @@ class MigrationRefreshCommand extends MigrationBaseCommand
      */
     protected function runReset(InputInterface $input, OutputInterface $output): void
     {
-        $command = Pocket::instance()->getConsoleApp()->find('migration:reset');
+        $command = Procket::instance()->getConsoleApp()->find('migration:reset');
         $arguments = array_filter([
             '--database' => $input->getOption('database')
         ]);
@@ -107,7 +107,7 @@ class MigrationRefreshCommand extends MigrationBaseCommand
      */
     protected function runMigrate(InputInterface $input, OutputInterface $output): void
     {
-        $command = Pocket::instance()->getConsoleApp()->find('migration:run');
+        $command = Procket::instance()->getConsoleApp()->find('migration:run');
         $arguments = array_filter([
             '--database' => $input->getOption('database')
         ]);

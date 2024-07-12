@@ -1,9 +1,9 @@
 <?php
 
-namespace Pocket\Framework\Commands;
+namespace Procket\Framework\Commands;
 
-use Pocket\Framework\Database\Migration\MigrationBaseCommand;
-use Pocket\Framework\Pocket;
+use Procket\Framework\Database\Migration\MigrationBaseCommand;
+use Procket\Framework\Procket;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,7 +26,7 @@ class MigrationResetCommand extends MigrationBaseCommand
             null,
             InputOption::VALUE_REQUIRED,
             'The database connection to use',
-            Pocket::instance()->defaultDbConnection
+            Procket::instance()->defaultDbConnection
         )->addOption(
             'pretend',
             null,

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework\Middleware;
+namespace Procket\Framework\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -10,7 +10,7 @@ use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use InvalidArgumentException;
-use Pocket\Framework\MiddlewareInterface;
+use Procket\Framework\MiddlewareInterface;
 use Random\RandomException;
 use Symfony\Component\HttpFoundation\Cookie;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Pocket\Framework\Commands;
+namespace Procket\Framework\Commands;
 
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Collection;
-use Pocket\Framework\Database\Migration\MigrationBaseCommand;
-use Pocket\Framework\Pocket;
+use Procket\Framework\Database\Migration\MigrationBaseCommand;
+use Procket\Framework\Procket;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +29,7 @@ class MigrationStatusCommand extends MigrationBaseCommand
             null,
             InputOption::VALUE_REQUIRED,
             'The database connection to use',
-            Pocket::instance()->defaultDbConnection
+            Procket::instance()->defaultDbConnection
         )->setDescription(
             'Show the status of each migration'
         );

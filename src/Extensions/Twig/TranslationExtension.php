@@ -1,8 +1,8 @@
 <?php
 
-namespace Pocket\Framework\Extensions\Twig;
+namespace Procket\Framework\Extensions\Twig;
 
-use Pocket\Framework\Pocket;
+use Procket\Framework\Procket;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -15,10 +15,10 @@ class TranslationExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('__', [Pocket::instance(), 'trans']),
-            new TwigFunction('trans', [Pocket::instance(), 'trans']),
-            new TwigFunction('__n', [Pocket::instance(), 'transChoice']),
-            new TwigFunction('trans_choice', [Pocket::instance(), 'transChoice']),
+            new TwigFunction('__', [Procket::instance(), 'trans']),
+            new TwigFunction('trans', [Procket::instance(), 'trans']),
+            new TwigFunction('__n', [Procket::instance(), 'transChoice']),
+            new TwigFunction('trans_choice', [Procket::instance(), 'transChoice']),
         ];
     }
 
@@ -28,19 +28,19 @@ class TranslationExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('__', [Pocket::instance(), 'trans'], [
+            new TwigFilter('__', [Procket::instance(), 'trans'], [
                 'pre_escape' => 'html',
                 'is_safe' => ['html']
             ]),
-            new TwigFilter('trans', [Pocket::instance(), 'trans'], [
+            new TwigFilter('trans', [Procket::instance(), 'trans'], [
                 'pre_escape' => 'html',
                 'is_safe' => ['html']
             ]),
-            new TwigFilter('__n', [Pocket::instance(), 'transChoice'], [
+            new TwigFilter('__n', [Procket::instance(), 'transChoice'], [
                 'pre_escape' => 'html',
                 'is_safe' => ['html']
             ]),
-            new TwigFilter('trans_choice', [Pocket::instance(), 'transChoice'], [
+            new TwigFilter('trans_choice', [Procket::instance(), 'transChoice'], [
                 'pre_escape' => 'html',
                 'is_safe' => ['html']
             ])

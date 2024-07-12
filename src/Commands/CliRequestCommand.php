@@ -1,9 +1,9 @@
 <?php
 
-namespace Pocket\Framework\Commands;
+namespace Procket\Framework\Commands;
 
-use Pocket\Framework\Pocket;
-use Pocket\Framework\Str;
+use Procket\Framework\Procket;
+use Procket\Framework\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,14 +35,14 @@ class CliRequestCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $httpRequest = Pocket::instance()->getHttpRequest();
+            $httpRequest = Procket::instance()->getHttpRequest();
             $queryStr = $input->getArgument('query');
             parse_str($queryStr, $queries);
             // Set query string input parameters
             $httpRequest->query->add($queries);
             // Set request input parameters
             $httpRequest->merge($queries);
-            $content = Pocket::instance()->callServiceApi();
+            $content = Procket::instance()->callServiceApi();
             if ($content instanceof SymfonyResponse) {
                 $outputContent = $content->getContent();
             } else {

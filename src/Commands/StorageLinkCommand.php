@@ -1,9 +1,9 @@
 <?php
 
-namespace Pocket\Framework\Commands;
+namespace Procket\Framework\Commands;
 
 use Illuminate\Filesystem\Filesystem;
-use Pocket\Framework\Pocket;
+use Procket\Framework\Procket;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -86,7 +86,7 @@ class StorageLinkCommand extends Command
      */
     protected function filesystem(): Filesystem
     {
-        return Pocket::instance()->getFilesystem();
+        return Procket::instance()->getFilesystem();
     }
 
     /**
@@ -97,7 +97,7 @@ class StorageLinkCommand extends Command
      */
     protected function links(array $inputLinkPairs = []): array
     {
-        $configLinks = (array)Pocket::instance()->getConfig('storage.links', []);
+        $configLinks = (array)Procket::instance()->getConfig('storage.links', []);
 
         return array_merge($configLinks, $inputLinkPairs);
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Pocket\Framework\Database\Migration;
+namespace Procket\Framework\Database\Migration;
 
 use Illuminate\Database\Migrations\MigrationCreator as BaseMigrationCreator;
 use Illuminate\Filesystem\Filesystem;
-use Pocket\Framework\ClassPropertiesAware;
+use Procket\Framework\ClassPropertiesAware;
 
 /**
  * Migration creator
@@ -20,7 +20,7 @@ class MigrationCreator extends BaseMigrationCreator
     public string $stub = <<<'STUB'
 <?php
 
-use Pocket\Framework\Database\Migration\Migration;
+use Procket\Framework\Database\Migration\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
 class {{ class }} extends Migration
@@ -51,7 +51,7 @@ STUB;
     public string $createStub = <<<'CREATE_STUB'
 <?php
 
-use Pocket\Framework\Database\Migration\Migration;
+use Procket\Framework\Database\Migration\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
 class {{ class }} extends Migration
@@ -85,7 +85,7 @@ CREATE_STUB;
     public string $updateStub = <<<'UPDATE_STUB'
 <?php
 
-use Pocket\Framework\Database\Migration\Migration;
+use Procket\Framework\Database\Migration\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
 class {{ class }} extends Migration

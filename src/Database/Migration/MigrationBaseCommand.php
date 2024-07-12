@@ -1,11 +1,11 @@
 <?php
 
-namespace Pocket\Framework\Database\Migration;
+namespace Procket\Framework\Database\Migration;
 
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Migrations\Migrator;
-use Pocket\Framework\ClassPropertiesAware;
-use Pocket\Framework\Pocket;
+use Procket\Framework\ClassPropertiesAware;
+use Procket\Framework\Procket;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 
@@ -39,7 +39,7 @@ abstract class MigrationBaseCommand extends Command
 
         $this->setClassOptions($options);
 
-        if (!Pocket::instance()->ensureDirectory($this->migrationsPath)) {
+        if (!Procket::instance()->ensureDirectory($this->migrationsPath)) {
             throw new RuntimeException(sprintf(
                 "<error>Directory %s does not exist and failed to create</error>",
                 $this->migrationsPath
@@ -54,7 +54,7 @@ abstract class MigrationBaseCommand extends Command
      */
     protected function getMigrator(): Migrator
     {
-        $resolver = Pocket::instance()->getDbManager()->getDatabaseManager();
+        $resolver = Procket::instance()->getDbManager()->getDatabaseManager();
         $repository = new DatabaseMigrationRepository($resolver, $this->repositoryTable);
         if (!$repository->repositoryExists()) {
             $repository->createRepository();
@@ -63,7 +63,7 @@ abstract class MigrationBaseCommand extends Command
         return new Migrator(
             $repository,
             $resolver,
-            Pocket::instance()->getFilesystem(),
+            Procket::instance()->getFilesystem(),
             $resolver->getEventDispatcher()
         );
     }

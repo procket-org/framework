@@ -11,8 +11,8 @@ use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Validation\Validator;
 use League\Flysystem\Filesystem as Flysystem;
 use Monolog\Logger;
-use Pocket\Framework\Pocket;
-use Pocket\Framework\ServiceApiException;
+use Procket\Framework\Procket;
+use Procket\Framework\ServiceApiException;
 use Predis\Client as PredisClient;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\Psr16Cache as SimpleCache;
@@ -21,15 +21,15 @@ use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Twig\TemplateWrapper;
 
-if (!function_exists('pocket')) {
+if (!function_exists('procket')) {
     /**
-     * Get the Pocket singleton
+     * Get the Procket singleton
      *
-     * @return Pocket
+     * @return Procket
      */
-    function pocket(): Pocket
+    function procket(): Procket
     {
-        return Pocket::instance();
+        return Procket::instance();
     }
 }
 
@@ -45,7 +45,7 @@ if (!function_exists('api')) {
      */
     function api(?string $route = null, ?array $params = null, ?array $constructorParams = null): mixed
     {
-        return Pocket::api($route, $params, $constructorParams);
+        return Procket::api($route, $params, $constructorParams);
     }
 }
 
@@ -59,7 +59,7 @@ if (!function_exists('config')) {
      */
     function config(array|string $key = null, mixed $default = null): mixed
     {
-        return pocket()->getConfig($key, $default);
+        return procket()->getConfig($key, $default);
     }
 }
 
@@ -74,7 +74,7 @@ if (!function_exists('__')) {
      */
     function __(string $key, array $replace = [], string $locale = null): array|string
     {
-        return pocket()->trans($key, $replace, $locale);
+        return procket()->trans($key, $replace, $locale);
     }
 }
 
@@ -90,7 +90,7 @@ if (!function_exists('__n')) {
      */
     function __n(string $key, Countable|float|int|array $number, array $replace = [], string $locale = null): string
     {
-        return pocket()->transChoice($key, $number, $replace, $locale);
+        return procket()->transChoice($key, $number, $replace, $locale);
     }
 }
 
@@ -104,7 +104,7 @@ if (!function_exists('render')) {
      */
     function render(TemplateWrapper|string $name, array $context = []): string
     {
-        return pocket()->render($name, $context);
+        return procket()->render($name, $context);
     }
 }
 
@@ -118,7 +118,7 @@ if (!function_exists('render_string')) {
      */
     function render_string(string $templateString, array $context = []): string
     {
-        return pocket()->renderString($templateString, $context);
+        return procket()->renderString($templateString, $context);
     }
 }
 
@@ -132,7 +132,7 @@ if (!function_exists('render_php')) {
      */
     function render_php(string $file, array $context = []): string
     {
-        return pocket()->renderPhp($file, $context);
+        return procket()->renderPhp($file, $context);
     }
 }
 
@@ -145,7 +145,7 @@ if (!function_exists('logger')) {
      */
     function logger(string $channel = 'app'): Logger
     {
-        return pocket()->getLogger($channel);
+        return procket()->getLogger($channel);
     }
 }
 
@@ -157,7 +157,7 @@ if (!function_exists('request')) {
      */
     function request(): HttpRequest
     {
-        return pocket()->getHttpRequest();
+        return procket()->getHttpRequest();
     }
 }
 
@@ -169,7 +169,7 @@ if (!function_exists('session')) {
      */
     function session(): Session
     {
-        return pocket()->getHttpSession();
+        return procket()->getHttpSession();
     }
 }
 
@@ -184,7 +184,7 @@ if (!function_exists('response')) {
      */
     function response(mixed $content = '', int $status = 200, array $headers = []): HttpResponse
     {
-        return pocket()->makeHttpResponse($content, $status, $headers);
+        return procket()->makeHttpResponse($content, $status, $headers);
     }
 }
 
@@ -196,7 +196,7 @@ if (!function_exists('http')) {
      */
     function http(): HttpClientRequest
     {
-        return pocket()->makeHttpClientRequest();
+        return procket()->makeHttpClientRequest();
     }
 }
 
@@ -209,7 +209,7 @@ if (!function_exists('db')) {
      */
     function db(string $connection = null): DbConnection
     {
-        return pocket()->getDbConnection($connection);
+        return procket()->getDbConnection($connection);
     }
 }
 
@@ -224,7 +224,7 @@ if (!function_exists('query')) {
      */
     function query(Closure|string|DbQueryBuilder|DbExpression $table, string $as = null, string $connection = null): DbQueryBuilder
     {
-        return pocket()->makeDbQuery($table, $as, $connection);
+        return procket()->makeDbQuery($table, $as, $connection);
     }
 }
 
@@ -237,7 +237,7 @@ if (!function_exists('redis')) {
      */
     function redis(string $connection = null): PredisClient
     {
-        return pocket()->getRedis($connection);
+        return procket()->getRedis($connection);
     }
 }
 
@@ -249,7 +249,7 @@ if (!function_exists('filesystem')) {
      */
     function filesystem(): Filesystem
     {
-        return pocket()->getFilesystem();
+        return procket()->getFilesystem();
     }
 }
 
@@ -264,7 +264,7 @@ if (!function_exists('ensure_directory')) {
      */
     function ensure_directory(string $path, int $mode = 0755, bool $recursive = true): bool
     {
-        return pocket()->ensureDirectory($path, $mode, $recursive);
+        return procket()->ensureDirectory($path, $mode, $recursive);
     }
 }
 
@@ -277,7 +277,7 @@ if (!function_exists('disk')) {
      */
     function disk(string $name): Flysystem
     {
-        return pocket()->getDisk($name);
+        return procket()->getDisk($name);
     }
 }
 
@@ -298,7 +298,7 @@ if (!function_exists('validator')) {
         array $customAttributes = []
     ): Validator
     {
-        return pocket()->makeValidator($data, $rules, $messages, $customAttributes);
+        return procket()->makeValidator($data, $rules, $messages, $customAttributes);
     }
 }
 
@@ -310,7 +310,7 @@ if (!function_exists('cache')) {
      */
     function cache(): TagAwareAdapterInterface|TagAwareCacheInterface
     {
-        return pocket()->getCache();
+        return procket()->getCache();
     }
 }
 
@@ -322,7 +322,7 @@ if (!function_exists('simple_cache')) {
      */
     function simple_cache(): SimpleCache
     {
-        return pocket()->getSimpleCache();
+        return procket()->getSimpleCache();
     }
 }
 
@@ -337,6 +337,6 @@ if (!function_exists('lock')) {
      */
     function lock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface|SharedLockInterface
     {
-        return pocket()->getLock($resource, $ttl, $autoRelease);
+        return procket()->getLock($resource, $ttl, $autoRelease);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework\Disk;
+namespace Procket\Framework\Disk;
 
 use Aws\S3\S3Client;
 use Illuminate\Support\Arr;
@@ -13,10 +13,10 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
-use Pocket\Framework\Disk\Drivers\Ftp;
-use Pocket\Framework\Disk\Drivers\Local;
-use Pocket\Framework\Disk\Drivers\S3;
-use Pocket\Framework\Disk\Drivers\Sftp;
+use Procket\Framework\Disk\Drivers\Ftp;
+use Procket\Framework\Disk\Drivers\Local;
+use Procket\Framework\Disk\Drivers\S3;
+use Procket\Framework\Disk\Drivers\Sftp;
 
 class DiskManager
 {

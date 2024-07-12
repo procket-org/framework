@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework;
+namespace Procket\Framework;
 
 use Illuminate\Support\Collection;
 use ReflectionClass;

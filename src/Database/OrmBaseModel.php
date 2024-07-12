@@ -1,10 +1,10 @@
 <?php
 
-namespace Pocket\Framework\Database;
+namespace Procket\Framework\Database;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
-use Pocket\Framework\Pocket;
+use Procket\Framework\Procket;
 
 /**
  * ORM base model
@@ -18,7 +18,7 @@ abstract class OrmBaseModel extends EloquentModel
      */
     protected static function booting(): void
     {
-        Pocket::instance()->getDbManager();
+        Procket::instance()->getDbManager();
         parent::booting();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework\Database\Migration;
+namespace Procket\Framework\Database\Migration;
 
 /**
  * Migration interface

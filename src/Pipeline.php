@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework;
+namespace Procket\Framework;
 
 use Closure;
 use Illuminate\Pipeline\Pipeline as BasePipeline;

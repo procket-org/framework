@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework\Disk\Drivers;
+namespace Procket\Framework\Disk\Drivers;
 
 use League\Flysystem\Ftp\FtpAdapter;
 
