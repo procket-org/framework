@@ -1,3 +1,3 @@
-# Pocket Framework
+# Procket Framework
 
-A PHP micro framework
+A PHP pocket rocket framework
