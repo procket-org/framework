@@ -1,6 +1,6 @@
 <?php
 
-namespace Pocket\Framework;
+namespace Procket\Framework;
 
 use Closure;
 use Composer\InstalledVersions;
@@ -34,8 +34,8 @@ use League\Flysystem\Filesystem as Flysystem;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\WebProcessor;
-use Pocket\Framework\Disk\DiskManager;
-use Pocket\Framework\Extensions\Twig\TranslationExtension;
+use Procket\Framework\Disk\DiskManager;
+use Procket\Framework\Extensions\Twig\TranslationExtension;
 use Predis\Client as PredisClient;
 use ReflectionClass;
 use ReflectionException;
@@ -65,9 +65,9 @@ use Twig\Loader\FilesystemLoader as TwigFileLoader;
 use Twig\TemplateWrapper;
 
 /**
- * The Pocket Framework
+ * The Procket Framework
  */
-class Pocket
+class Procket
 {
     use ClassPropertiesAware;
 
@@ -337,7 +337,7 @@ class Pocket
      * Singleton
      * @var static|null
      */
-    private static ?Pocket $instance = null;
+    private static ?Procket $instance = null;
 
     /**
      * To prevent multiple instances from being created
@@ -354,11 +354,11 @@ class Pocket
     }
 
     /**
-     * Get the Pocket singleton
+     * Get the Procket singleton
      *
      * @return self
      */
-    public static function instance(): Pocket
+    public static function instance(): Procket
     {
         if (isset(self::$instance)) {
             return self::$instance;
@@ -992,7 +992,7 @@ class Pocket
                         'database' => env('REDIS_DB', '0'),
                     ],
                     'options' => [
-                        'prefix' => 'pocket_database:'
+                        'prefix' => 'procket_database:'
                     ]
                 ],
                 'cache' => [
@@ -1004,7 +1004,7 @@ class Pocket
                         'database' => env('REDIS_CACHE_DB', '1'),
                     ],
                     'options' => [
-                        'prefix' => 'pocket_cache:'
+                        'prefix' => 'procket_cache:'
                     ]
                 ],
                 'lock' => [
@@ -1016,7 +1016,7 @@ class Pocket
                         'database' => env('REDIS_LOCK_DB', '2'),
                     ],
                     'options' => [
-                        'prefix' => 'pocket_lock:'
+                        'prefix' => 'procket_lock:'
                     ]
                 ]
             ];
@@ -1317,8 +1317,8 @@ class Pocket
             return $this->consoleApp;
         }
 
-        $version = InstalledVersions::getVersion('pocket/framework');
-        $this->consoleApp = new ConsoleApp('pocket', $version);
+        $version = InstalledVersions::getVersion('procket/framework');
+        $this->consoleApp = new ConsoleApp('procket', $version);
 
         // Add built-in commands
         $allCommandFiles = [
@@ -1330,7 +1330,7 @@ class Pocket
         }
         foreach ($allCommandFiles as $type => $files) {
             if ($type === 'built_in') {
-                $nsPrefix = '\\Pocket\\Framework\\Commands\\';
+                $nsPrefix = '\\Procket\\Framework\\Commands\\';
             } else if ($type === 'app') {
                 $nsPrefix = APP_NS_PREFIX . '\\Commands\\';
             } else {
@@ -1480,7 +1480,7 @@ class Pocket
      * @param array|null $array associative array or sequential array, obtained from request by default
      * @return array
      * @throws ReflectionException
-     * @see Pocket::getClassMethodArgs()
+     * @see Procket::getClassMethodArgs()
      */
     public function getClassMethodArgsFromArray(object|string $class, string $method, ?array $array = null): array
     {
