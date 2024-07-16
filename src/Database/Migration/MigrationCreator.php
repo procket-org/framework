@@ -40,8 +40,7 @@ return new class extends Migration
     {
         //
     }
-}
-
+};
 STUB;
 
     /**
@@ -74,8 +73,7 @@ return new class extends Migration
     {
         $this->schema()->dropIfExists('{{ table }}');
     }
-}
-
+};
 CREATE_STUB;
 
     /**
@@ -109,8 +107,7 @@ return new class extends Migration
             //
         });
     }
-}
-
+};
 UPDATE_STUB;
 
     /**
