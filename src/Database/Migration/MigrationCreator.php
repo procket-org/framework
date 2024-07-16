@@ -23,7 +23,7 @@ class MigrationCreator extends BaseMigrationCreator
 use Procket\Framework\Database\Migration\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class {{ class }} extends Migration
+return new class extends Migration
 {
 	/**
 	 * @inheritDoc
@@ -54,7 +54,7 @@ STUB;
 use Procket\Framework\Database\Migration\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class {{ class }} extends Migration
+return new class extends Migration
 {
 	/**
 	 * @inheritDoc
@@ -88,7 +88,7 @@ CREATE_STUB;
 use Procket\Framework\Database\Migration\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class {{ class }} extends Migration
+return new class extends Migration
 {
 	/**
 	 * @inheritDoc
