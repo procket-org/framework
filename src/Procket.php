@@ -1647,6 +1647,14 @@ class Procket
 
         $method = $this->routedActionIsMagic() ? '__call' : $this->getRoutedAction();
         $rfAction = new ReflectionMethod($serviceInstance, $method);
+        if (!$rfAction->isPublic()) {
+            throw new RuntimeException(sprintf(
+                "Cannot call non-public method '%s\\%s::%s()' through API mode",
+                $this->getRoutedGroup(),
+                $this->getRoutedService(),
+                $this->getRoutedAction()
+            ));
+        }
         if (Str::contains($rfAction->getDocComment(), '@internal')) {
             throw new RuntimeException(sprintf(
                 "Cannot call internal method '%s\\%s::%s()' through API mode",
