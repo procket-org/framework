@@ -196,16 +196,16 @@ class Procket
     public ?array $diskConfigs = null;
 
     /**
-     * Input route parameter value
+     * Routed path
      * @var string|null
      */
-    protected ?string $inputRoute = null;
+    protected ?string $routedPath = null;
 
     /**
-     * Input segments
+     * Routed segments
      * @var array
      */
-    protected array $inputSegments = [];
+    protected array $routedSegments = [];
 
     /**
      * Routed group
@@ -436,6 +436,8 @@ class Procket
     protected function stageRoutedProperties(): array
     {
         $this->stagedRoutedProperties[] = [
+            $this->routedPath,
+            $this->routedSegments,
             $this->routedGroup,
             $this->routedService,
             $this->routedAction,
@@ -458,6 +460,8 @@ class Procket
 
         if (!is_null($routedProperties)) {
             [
+                $this->routedPath,
+                $this->routedSegments,
                 $this->routedGroup,
                 $this->routedService,
                 $this->routedAction,
@@ -484,8 +488,8 @@ class Procket
                 [$this->defaultGroup, $this->defaultService, $this->defaultAction] :
                 [$this->defaultService, $this->defaultAction]
         );
-        $this->inputRoute = $this->getHttpRequest()->input($this->routeName);
-        $route = trim(($route ?: $this->inputRoute) ?: $default, '/');
+        $inputRoute = $this->getHttpRequest()->input($this->routeName);
+        $route = trim(($route ?: $inputRoute) ?: $default, '/');
 
         $parts = [];
         foreach (explode('/', $route) as $part) {
@@ -505,7 +509,8 @@ class Procket
             $this->routedGroup = $parts[0];
             $this->routedService = $parts[1];
             $this->routedAction = $parts[2];
-            $this->inputSegments = array_slice($parts, 3);
+            $this->routedPath = implode('/', array_slice($parts, 0, 3));
+            $this->routedSegments = array_slice($parts, 3);
         } else {
             // If there is only one part, we will consider it a service
             if (count($parts) === 1) {
@@ -514,7 +519,8 @@ class Procket
             $this->routedGroup = $this->defaultGroup;
             $this->routedService = $parts[0];
             $this->routedAction = $parts[1];
-            $this->inputSegments = array_slice($parts, 2);
+            $this->routedPath = implode('/', array_slice($parts, 0, 2));
+            $this->routedSegments = array_slice($parts, 2);
         }
     }
 
@@ -618,23 +624,23 @@ class Procket
     }
 
     /**
-     * Get input route parameter value
+     * Get routed path
      *
      * @return string|null
      */
-    public function getInputRoute(): ?string
+    public function getRoutedPath(): ?string
     {
-        return $this->inputRoute;
+        return $this->routedPath;
     }
 
     /**
-     * Get input segments
+     * Get routed segments
      *
      * @return array
      */
-    public function getInputSegments(): array
+    public function getRoutedSegments(): array
     {
-        return $this->inputSegments;
+        return $this->routedSegments;
     }
 
     /**
@@ -1425,7 +1431,7 @@ class Procket
             unset($namedParams[$this->routeName]);
         }
         if (is_null($segments)) {
-            $segments = $this->getInputSegments();
+            $segments = $this->getRoutedSegments();
         }
 
         if ($method === '__call') {
