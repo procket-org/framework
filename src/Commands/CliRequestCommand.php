@@ -21,9 +21,17 @@ class CliRequestCommand extends Command
         $this->setName(
             'cli:request'
         )->addArgument(
-            'query',
+            'route',
             InputArgument::OPTIONAL,
-            'URL query string'
+            'The route string'
+        )->addArgument(
+            'params',
+            InputArgument::OPTIONAL,
+            'Action parameters (http query string style)'
+        )->addArgument(
+            'constructor-params',
+            InputArgument::OPTIONAL,
+            'Constructor parameters (http query string style)'
         )->setDescription(
             'Make an application request'
         );
@@ -35,14 +43,10 @@ class CliRequestCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $httpRequest = Procket::instance()->getHttpRequest();
-            $queryStr = $input->getArgument('query');
-            parse_str($queryStr, $queries);
-            // Set query string input parameters
-            $httpRequest->query->add($queries);
-            // Set request input parameters
-            $httpRequest->merge($queries);
-            $content = Procket::instance()->callServiceApi();
+            $route = $input->getArgument('route');
+            parse_str((string)$input->getArgument('params'), $params);
+            parse_str((string)$input->getArgument('constructor-params'), $constructorParams);
+            $content = Procket::instance()->callServiceApi($route, $params, $constructorParams);
             if ($content instanceof SymfonyResponse) {
                 $outputContent = $content->getContent();
             } else {

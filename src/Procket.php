@@ -53,6 +53,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\SharedLockInterface;
@@ -1744,7 +1745,7 @@ class Procket
             $response = $this->makeHttpResponse($content);
         }
 
-        if ($response->getStatusCode() === HttpResponse::HTTP_NOT_MODIFIED) {
+        if ($response->getStatusCode() === SymfonyResponse::HTTP_NOT_MODIFIED) {
             $response->setNotModified();
         }
 
