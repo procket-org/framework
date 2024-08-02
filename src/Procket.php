@@ -475,12 +475,18 @@ class Procket
     }
 
     /**
-     * Resolve route into current route parameters
+     * Parse the route string
      *
      * @param string|null $route The route string, obtained from request parameters by default
-     * @return void
+     * @return array{
+     *     group: string,
+     *     service: string,
+     *     action: string,
+     *     path: string,
+     *     segments: string[],
+     * }
      */
-    protected function parseRoute(?string $route = null): void
+    protected function parseRoute(?string $route = null): array
     {
         $default = implode(
             '/',
@@ -506,21 +512,100 @@ class Procket
             else if (count($parts) === 1) {
                 $parts = [$parts[0], $this->defaultService, $this->defaultAction];
             }
-            $this->routedGroup = $parts[0];
-            $this->routedService = $parts[1];
-            $this->routedAction = $parts[2];
-            $this->routedPath = implode('/', array_slice($parts, 0, 3));
-            $this->routedSegments = array_slice($parts, 3);
+            $group = $parts[0];
+            $service = $parts[1];
+            $action = $parts[2];
+            $path = implode('/', array_slice($parts, 0, 3));
+            $segments = array_slice($parts, 3);
         } else {
             // If there is only one part, we will consider it a service
             if (count($parts) === 1) {
                 $parts = [$parts[0], $this->defaultAction];
             }
-            $this->routedGroup = $this->defaultGroup;
-            $this->routedService = $parts[0];
-            $this->routedAction = $parts[1];
-            $this->routedPath = implode('/', array_slice($parts, 0, 2));
-            $this->routedSegments = array_slice($parts, 2);
+            $group = $this->defaultGroup;
+            $service = $parts[0];
+            $action = $parts[1];
+            $path = implode('/', array_slice($parts, 0, 2));
+            $segments = array_slice($parts, 2);
+        }
+
+        return [
+            'group' => $group,
+            'service' => $service,
+            'action' => $action,
+            'path' => $path,
+            'segments' => $segments,
+        ];
+    }
+
+    /**
+     * Resolve route into current route properties
+     *
+     * @param string|null $route The route string, obtained from request parameters by default
+     * @param array|null $constructorParams Constructor parameters, obtained from request parameters by default
+     * @return void
+     * @throws ReflectionException
+     * @throws ServiceApiException
+     */
+    protected function route(?string $route = null, ?array $constructorParams = null): void
+    {
+        $routeProperties = $this->parseRoute($route);
+        $this->routedGroup = $routeProperties['group'];
+        $this->routedService = $routeProperties['service'];
+        $this->routedAction = $routeProperties['action'];
+        $this->routedPath = $routeProperties['path'];
+        $this->routedSegments = $routeProperties['segments'];
+
+        $serviceClass = $this->getServiceClassName($this->getRoutedGroup(), $this->getRoutedService());
+        // if the service class does not exist and the magic service exists
+        $magicServiceClass = $this->getServiceNamespace($this->getRoutedGroup()) . '\\' . $this->formatServiceName($this->magicServiceName);
+        if (!class_exists($serviceClass) && class_exists($magicServiceClass)) {
+            $this->routedServiceIsMagic = true;
+            $serviceClass = $magicServiceClass;
+        }
+
+        if (!$this->getRoutedGroup() || !$this->getRoutedService()) {
+            throw new ServiceApiException(sprintf(
+                "Parameter '%s' is invalid",
+                $this->routeName
+            ));
+        }
+        if (!class_exists($serviceClass)) {
+            throw new ServiceApiException(sprintf(
+                "Resource '%s/%s' not found",
+                $this->getRoutedGroup(),
+                str_replace('\\', '.', $this->getRoutedService())
+            ), 404);
+        }
+        if (!is_subclass_of($serviceClass, ServiceInterface::class)) {
+            throw new RuntimeException(sprintf(
+                "Class '%s' is not a service, should implements '%s'",
+                $serviceClass,
+                ServiceInterface::class
+            ));
+        }
+
+        /** @var ServiceInterface $serviceInstance */
+        $rfService = new ReflectionClass($serviceClass);
+        if ($rfService->hasMethod('__construct')) {
+            $invokeArgs = $this->getClassMethodArgsFromArray($serviceClass, '__construct', $constructorParams);
+            $serviceInstance = $rfService->newInstanceArgs($invokeArgs);
+        } else {
+            $serviceInstance = $rfService->newInstance();
+        }
+        $this->routedServiceInstance = $serviceInstance;
+
+        if (!method_exists($serviceInstance, $this->getRoutedAction())) {
+            if (method_exists($serviceInstance, '__call')) {
+                $this->routedActionIsMagic = true;
+            } else {
+                throw new ServiceApiException(sprintf(
+                    "Resource '%s/%s/%s' not found",
+                    $this->getRoutedGroup(),
+                    str_replace('\\', '.', $this->getRoutedService()),
+                    $this->getRoutedAction()
+                ), 404);
+            }
         }
     }
 
@@ -626,10 +711,29 @@ class Procket
     /**
      * Get routed path
      *
+     * @param bool $normalize Normalize the routed path
      * @return string|null
      */
-    public function getRoutedPath(): ?string
+    public function getRoutedPath(bool $normalize = true): ?string
     {
+        if ($normalize && $this->routedPath) {
+            $parts = explode('/', $this->routedPath);
+            if ($this->multipleGroups()) {
+                [$routedGroup, $routedService, $routedAction] = $parts;
+                return implode('/', [
+                    Str::studly($routedGroup),
+                    $this->formatServiceName($routedService, true),
+                    Str::camel($routedAction)
+                ]);
+            } else {
+                [$routedService, $routedAction] = $parts;
+                return implode('/', [
+                    $this->formatServiceName($routedService, true),
+                    Str::camel($routedAction)
+                ]);
+            }
+        }
+
         return $this->routedPath;
     }
 
@@ -1597,60 +1701,9 @@ class Procket
      */
     public function callServiceApi(?string $route = null, ?array $params = null, ?array $constructorParams = null): mixed
     {
-        $this->parseRoute($route);
+        $this->route($route, $constructorParams);
 
-        $serviceClass = $this->getServiceClassName($this->getRoutedGroup(), $this->getRoutedService());
-        // if the service class does not exist and the magic service exists
-        $magicServiceClass = $this->getServiceNamespace($this->getRoutedGroup()) . '\\' . $this->formatServiceName($this->magicServiceName);
-        if (!class_exists($serviceClass) && class_exists($magicServiceClass)) {
-            $this->routedServiceIsMagic = true;
-            $serviceClass = $magicServiceClass;
-        }
-
-        if (!$this->getRoutedGroup() || !$this->getRoutedService()) {
-            throw new ServiceApiException(sprintf(
-                "Parameter '%s' is invalid",
-                $this->routeName
-            ));
-        }
-        if (!class_exists($serviceClass)) {
-            throw new ServiceApiException(sprintf(
-                "Resource '%s/%s' not found",
-                $this->getRoutedGroup(),
-                str_replace('\\', '.', $this->getRoutedService())
-            ), 404);
-        }
-        if (!is_subclass_of($serviceClass, ServiceInterface::class)) {
-            throw new RuntimeException(sprintf(
-                "Class '%s' is not a service, should implements '%s'",
-                $serviceClass,
-                ServiceInterface::class
-            ));
-        }
-
-        /** @var ServiceInterface $serviceInstance */
-        $rfService = new ReflectionClass($serviceClass);
-        if ($rfService->hasMethod('__construct')) {
-            $invokeArgs = $this->getClassMethodArgsFromArray($serviceClass, '__construct', $constructorParams);
-            $serviceInstance = $rfService->newInstanceArgs($invokeArgs);
-        } else {
-            $serviceInstance = $rfService->newInstance();
-        }
-        $this->routedServiceInstance = $serviceInstance;
-
-        if (!method_exists($serviceInstance, $this->getRoutedAction())) {
-            if (method_exists($serviceInstance, '__call')) {
-                $this->routedActionIsMagic = true;
-            } else {
-                throw new ServiceApiException(sprintf(
-                    "Resource '%s/%s/%s' not found",
-                    $this->getRoutedGroup(),
-                    str_replace('\\', '.', $this->getRoutedService()),
-                    $this->getRoutedAction()
-                ), 404);
-            }
-        }
-
+        $serviceInstance = $this->getRoutedServiceInstance();
         $method = $this->routedActionIsMagic() ? '__call' : $this->getRoutedAction();
         $rfAction = new ReflectionMethod($serviceInstance, $method);
         if (!$rfAction->isPublic()) {
