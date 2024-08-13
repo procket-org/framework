@@ -43,23 +43,6 @@ class Str extends BaseStr
     }
 
     /**
-     * Check if the value is JSON string
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    public static function isJsonString(mixed $value): bool
-    {
-        if (!is_string($value) || $value === '') {
-            return false;
-        }
-
-        json_decode($value, true);
-
-        return json_last_error() === JSON_ERROR_NONE;
-    }
-
-    /**
      * Check if the value is a regular expression
      *
      * @param mixed $value
