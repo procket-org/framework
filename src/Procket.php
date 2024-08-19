@@ -82,7 +82,7 @@ class Procket
      * Whether to enable multiple groups
      * @var bool
      */
-    public bool $multipleGroups = true;
+    public bool $multipleGroups = false;
 
     /**
      * Locale code
@@ -573,9 +573,7 @@ class Procket
         }
         if (!class_exists($serviceClass)) {
             throw new ServiceApiException(sprintf(
-                "Resource '%s/%s' not found",
-                $this->getRoutedGroup(),
-                str_replace('\\', '.', $this->getRoutedService())
+                "Service class '%s' not found", $serviceClass
             ), 404);
         }
         if (!is_subclass_of($serviceClass, ServiceInterface::class)) {
@@ -601,10 +599,7 @@ class Procket
                 $this->routedActionIsMagic = true;
             } else {
                 throw new ServiceApiException(sprintf(
-                    "Resource '%s/%s/%s' not found",
-                    $this->getRoutedGroup(),
-                    str_replace('\\', '.', $this->getRoutedService()),
-                    $this->getRoutedAction()
+                    "Resource '%s' not found", $this->getRoutedPath()
                 ), 404);
             }
         }
@@ -1709,18 +1704,14 @@ class Procket
         $rfAction = new ReflectionMethod($serviceInstance, $method);
         if (!$rfAction->isPublic()) {
             throw new RuntimeException(sprintf(
-                "Cannot call non-public method '%s\\%s::%s()' through API mode",
-                $this->getRoutedGroup(),
-                $this->getRoutedService(),
-                $this->getRoutedAction()
+                "Unable to call non-public resource '%s' through API mode",
+                $this->getRoutedPath()
             ));
         }
         if (Str::contains($rfAction->getDocComment(), '@internal')) {
             throw new RuntimeException(sprintf(
-                "Cannot call internal method '%s\\%s::%s()' through API mode",
-                $this->getRoutedGroup(),
-                $this->getRoutedService(),
-                $this->getRoutedAction()
+                "Unable to call internal resource '%s' through API mode",
+                $this->getRoutedPath()
             ));
         }
 
