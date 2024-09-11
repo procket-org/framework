@@ -197,18 +197,6 @@ class Procket
     public ?array $diskConfigs = null;
 
     /**
-     * Routed path
-     * @var string|null
-     */
-    protected ?string $routedPath = null;
-
-    /**
-     * Routed segments
-     * @var array
-     */
-    protected array $routedSegments = [];
-
-    /**
      * Routed group
      * @var string|null
      */
@@ -225,6 +213,18 @@ class Procket
      * @var string|null
      */
     protected ?string $routedAction = null;
+
+    /**
+     * Routed path
+     * @var string|null
+     */
+    protected ?string $routedPath = null;
+
+    /**
+     * Routed segments
+     * @var array
+     */
+    protected array $routedSegments = [];
 
     /**
      * Routed service is magic service or not
@@ -437,11 +437,11 @@ class Procket
     protected function stageRoutedProperties(): array
     {
         $this->stagedRoutedProperties[] = [
-            $this->routedPath,
-            $this->routedSegments,
             $this->routedGroup,
             $this->routedService,
             $this->routedAction,
+            $this->routedPath,
+            $this->routedSegments,
             $this->routedServiceIsMagic,
             $this->routedActionIsMagic,
             $this->routedServiceInstance
@@ -461,11 +461,11 @@ class Procket
 
         if (!is_null($routedProperties)) {
             [
-                $this->routedPath,
-                $this->routedSegments,
                 $this->routedGroup,
                 $this->routedService,
                 $this->routedAction,
+                $this->routedPath,
+                $this->routedSegments,
                 $this->routedServiceIsMagic,
                 $this->routedActionIsMagic,
                 $this->routedServiceInstance
@@ -485,6 +485,8 @@ class Procket
      *     action: string,
      *     path: string,
      *     segments: string[],
+     *     service_class: string|null,
+     *     service_is_magic: bool
      * }
      */
     protected function parseRoute(?string $route = null): array
@@ -530,12 +532,24 @@ class Procket
             $segments = array_slice($parts, 2);
         }
 
+        $serviceClass = $this->getServiceClassName($group, $service);
+        // if the service class does not exist and the magic service exists
+        $magicServiceClass = $this->getServiceNamespace($group) . '\\' . $this->formatServiceName($this->magicServiceName);
+        if (!class_exists($serviceClass) && class_exists($magicServiceClass)) {
+            $serviceIsMagic = true;
+            $serviceClass = $magicServiceClass;
+        } else {
+            $serviceIsMagic = false;
+        }
+
         return [
             'group' => $group,
             'service' => $service,
             'action' => $action,
             'path' => $path,
             'segments' => $segments,
+            'service_class' => $serviceClass,
+            'service_is_magic' => $serviceIsMagic
         ];
     }
 
@@ -557,14 +571,8 @@ class Procket
         $this->routedPath = $routeProperties['path'];
         $this->routedSegments = $routeProperties['segments'];
 
-        $serviceClass = $this->getServiceClassName($this->getRoutedGroup(), $this->getRoutedService());
-        // if the service class does not exist and the magic service exists
-        $magicServiceClass = $this->getServiceNamespace($this->getRoutedGroup()) . '\\' . $this->formatServiceName($this->magicServiceName);
-        if (!class_exists($serviceClass) && class_exists($magicServiceClass)) {
-            $this->routedServiceIsMagic = true;
-            $serviceClass = $magicServiceClass;
-        }
-
+        $serviceClass = $routeProperties['service_class'];
+        $this->routedServiceIsMagic = $routeProperties['service_is_magic'];
         if (!$this->getRoutedGroup() || !$this->getRoutedService()) {
             throw new ServiceApiException(sprintf(
                 "Parameter '%s' is invalid",
