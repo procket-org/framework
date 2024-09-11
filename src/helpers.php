@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Psr16Cache as SimpleCache;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Twig\Environment as TwigEngine;
 use Twig\TemplateWrapper;
 
 if (!function_exists('procket')) {
@@ -91,6 +92,18 @@ if (!function_exists('__n')) {
     function __n(string $key, Countable|float|int|array $number, array $replace = [], string $locale = null): string
     {
         return procket()->transChoice($key, $number, $replace, $locale);
+    }
+}
+
+if (!function_exists('twig')) {
+    /**
+     * Get twig template engine
+     *
+     * @return TwigEngine
+     */
+    function twig(): TwigEngine
+    {
+        return procket()->getTwig();
     }
 }
 
