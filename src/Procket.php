@@ -601,6 +601,7 @@ class Procket
             $serviceInstance = $rfService->newInstance();
         }
         $this->routedServiceInstance = $serviceInstance;
+        $this->routedActionIsMagic = false;
 
         if (!method_exists($serviceInstance, $this->getRoutedAction())) {
             if (method_exists($serviceInstance, '__call')) {
