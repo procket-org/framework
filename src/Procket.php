@@ -1389,7 +1389,7 @@ class Procket
     }
 
     /**
-     * Determine if the value passes the validation rules. If not, throw an {@see ServiceApiException} exception.
+     * Determine if the value passes the validation rule. If not, throw an {@see ServiceApiException} exception.
      *
      * @param string $attribute Attribute name
      * @param mixed $value Value to be verified
@@ -1401,6 +1401,31 @@ class Procket
     {
         if ($error = $this->validationFailed($attribute, $value, $rule)) {
             throw new ServiceApiException($error, HttpStatus::UNPROCESSABLE_ENTITY);
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if the data passes the validation rules. If not, throw an {@see ServiceApiException} exception.
+     *
+     * @param array $data Data to be verified
+     * @param array $rules Validation rules
+     * @param array $messages Validation message
+     * @param array $customAttributes Custom attributes
+     * @return true
+     * @throws ServiceApiException
+     */
+    public function validateMany(
+        array $data,
+        array $rules,
+        array $messages = [],
+        array $customAttributes = []
+    ): true
+    {
+        $validator = $this->makeValidator($data, $rules, $messages, $customAttributes);
+        if ($validator->fails()) {
+            throw new ServiceApiException($validator->errors(), HttpStatus::UNPROCESSABLE_ENTITY);
         }
 
         return true;

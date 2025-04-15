@@ -347,7 +347,7 @@ if (!function_exists('validation_passed')) {
 
 if (!function_exists('validate')) {
     /**
-     * Determine if the value passes the validation rules. If not, throw an {@see ServiceApiException} exception.
+     * Determine if the value passes the validation rule. If not, throw an {@see ServiceApiException} exception.
      *
      * @param string $attribute Attribute name
      * @param mixed $value Value to be verified
@@ -358,6 +358,28 @@ if (!function_exists('validate')) {
     function validate(string $attribute, mixed $value, string|array $rule): true
     {
         return procket()->validate($attribute, $value, $rule);
+    }
+}
+
+if (!function_exists('validate_many')) {
+    /**
+     * Determine if the data passes the validation rules. If not, throw an {@see ServiceApiException} exception.
+     *
+     * @param array $data Data to be verified
+     * @param array $rules Validation rules
+     * @param array $messages Validation message
+     * @param array $customAttributes Custom attributes
+     * @return true
+     * @throws ServiceApiException
+     */
+    function validate_many(
+        array $data,
+        array $rules,
+        array $messages = [],
+        array $customAttributes = []
+    ): true
+    {
+        return procket()->validateMany($data, $rules, $messages, $customAttributes);
     }
 }
 
