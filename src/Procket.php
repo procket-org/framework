@@ -27,6 +27,7 @@ use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Illuminate\Translation\FileLoader as TranslationFileLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Validation\Factory as Validation;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
@@ -1328,6 +1329,7 @@ class Procket
         }
 
         $validation = new Validation($this->getTranslator(), new Container());
+        $validation->setPresenceVerifier(new DatabasePresenceVerifier($this->getDbManager()->getDatabaseManager()));
 
         return $this->validation = $validation;
     }
