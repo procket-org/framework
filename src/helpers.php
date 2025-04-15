@@ -345,6 +345,22 @@ if (!function_exists('validation_passed')) {
     }
 }
 
+if (!function_exists('validate')) {
+    /**
+     * Determine if the value passes the validation rules. If not, throw an {@see ServiceApiException} exception.
+     *
+     * @param string $attribute Attribute name
+     * @param mixed $value Value to be verified
+     * @param string|array $rule Validation rule
+     * @return true
+     * @throws ServiceApiException
+     */
+    function validate(string $attribute, mixed $value, string|array $rule): true
+    {
+        return procket()->validate($attribute, $value, $rule);
+    }
+}
+
 if (!function_exists('cache')) {
     /**
      * Get cache instance

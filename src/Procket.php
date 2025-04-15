@@ -1387,6 +1387,24 @@ class Procket
     }
 
     /**
+     * Determine if the value passes the validation rules. If not, throw an {@see ServiceApiException} exception.
+     *
+     * @param string $attribute Attribute name
+     * @param mixed $value Value to be verified
+     * @param string|array $rule Validation rule
+     * @return true
+     * @throws ServiceApiException
+     */
+    public function validate(string $attribute, mixed $value, string|array $rule): true
+    {
+        if ($error = $this->validationFailed($attribute, $value, $rule)) {
+            throw new ServiceApiException($error, HttpStatus::UNPROCESSABLE_ENTITY);
+        }
+
+        return true;
+    }
+
+    /**
      * Get cache instance
      *
      * @return TagAwareAdapterInterface|TagAwareCacheInterface
