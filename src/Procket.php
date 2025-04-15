@@ -1352,6 +1352,41 @@ class Procket
     }
 
     /**
+     * Determine if the value fails the validation rule.
+     *
+     * @param string $attribute Attribute name
+     * @param mixed $value Value to be verified
+     * @param string|array $rule Validation rule
+     * @return string|null Return an error message if the validation fails. otherwise, return null.
+     */
+    public function validationFailed(string $attribute, mixed $value, string|array $rule): ?string
+    {
+        $validator = $this->makeValidator(
+            [$attribute => $value],
+            [$attribute => $rule]
+        );
+
+        if ($validator->fails()) {
+            return $validator->errors()->first($attribute) ?: 'Attribute validation failed.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine if the value passes the validation rule.
+     *
+     * @param string $attribute Attribute name
+     * @param mixed $value Value to be verified
+     * @param string|array $rule Validation rule
+     * @return bool
+     */
+    public function validationPassed(string $attribute, mixed $value, string|array $rule): bool
+    {
+        return !$this->validationFailed($attribute, $value, $rule);
+    }
+
+    /**
      * Get cache instance
      *
      * @return TagAwareAdapterInterface|TagAwareCacheInterface

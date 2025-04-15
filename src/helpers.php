@@ -315,6 +315,36 @@ if (!function_exists('validator')) {
     }
 }
 
+if (!function_exists('validation_failed')) {
+    /**
+     * Determine if the value fails the validation rule.
+     *
+     * @param string $attribute Attribute name
+     * @param mixed $value Value to be verified
+     * @param string|array $rule Validation rule
+     * @return string|null Return an error message if the validation fails. otherwise, return null.
+     */
+    function validation_failed(string $attribute, mixed $value, string|array $rule): ?string
+    {
+        return procket()->validationFailed($attribute, $value, $rule);
+    }
+}
+
+if (!function_exists('validation_passed')) {
+    /**
+     * Determine if the value passes the validation rule.
+     *
+     * @param string $attribute Attribute name
+     * @param mixed $value Value to be verified
+     * @param string|array $rule Validation rule
+     * @return bool
+     */
+    function validation_passed(string $attribute, mixed $value, string|array $rule): bool
+    {
+        return procket()->validationPassed($attribute, $value, $rule);
+    }
+}
+
 if (!function_exists('cache')) {
     /**
      * Get cache instance
