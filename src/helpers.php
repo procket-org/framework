@@ -421,3 +421,53 @@ if (!function_exists('lock')) {
         return procket()->getLock($resource, $ttl, $autoRelease);
     }
 }
+
+############################################# Custom Functions #############################################
+
+if (!function_exists('func_get_args_assoc')) {
+    /**
+     * Dynamically retrieves the argument names and values from a function or method call.
+     *
+     * **Manual Mode:**
+     * If both `$args` (arguments) and `$func` (function name) are provided,
+     * the function uses these values to perform the reflection, providing a fast,
+     * low-overhead method of extracting argument names and values.
+     *
+     * **Auto Mode:**
+     * If no manual arguments or function name are provided,
+     * the function uses debug_backtrace() to inspect the calling function/method and extracts the arguments dynamically.
+     * This mode is more flexible but slower.
+     *
+     * The following is a simple benchmark test executed 100,000 times for reference：
+     * **Manual Mode:** 0.2912 seconds
+     * **Auto Mode:** 0.4971 seconds
+     *
+     * @param array|null $args An array of arguments passed to the function or method, e.g. {@see func_get_args()}.
+     * @param array|string|null $func The name of the function or method being called, e.g. `__FUNCTION__` or `[$this, __FUNCTION__]`.
+     * @return array Returns an associative array where the keys are the parameter names and the values are the corresponding argument values passed to the function.
+     * @throws ReflectionException
+     */
+    function func_get_args_assoc(array $args = null, array|string|null $func = null): array
+    {
+        // Use manual mode if args & func are provided
+        if ($args !== null && $func !== null) {
+            $ref = is_array($func) ? new ReflectionMethod($func[0], $func[1]) : new ReflectionFunction($func);
+        } else {
+            // Auto mode using debug_backtrace
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $caller = $trace[1];
+            $args = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2)[1]['args'];
+            $ref = isset($caller['class'])
+                ? new ReflectionMethod($caller['class'], $caller['function'])
+                : new ReflectionFunction($caller['function']);
+        }
+
+        $assoc = [];
+        $params = $ref->getParameters();
+        foreach ($params as $index => $param) {
+            $assoc[$param->getName()] = $args[$index] ?? ($param->isDefaultValueAvailable() ? $param->getDefaultValue() : null);
+        }
+
+        return $assoc;
+    }
+}
