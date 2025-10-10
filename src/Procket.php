@@ -1813,11 +1813,11 @@ class Procket
      * Create a response instance from the given content
      *
      * @param mixed $content
-     * @return HttpResponse
+     * @return SymfonyResponse
      */
-    public function toResponse(mixed $content): HttpResponse
+    public function toResponse(mixed $content): SymfonyResponse
     {
-        if ($content instanceof HttpResponse) {
+        if ($content instanceof SymfonyResponse) {
             $response = $content;
         } else if ($content instanceof stdClass) {
             $response = $this->makeHttpResponse((array)$content);
@@ -1835,11 +1835,11 @@ class Procket
     /**
      * Provide API HTTP Response content
      *
-     * @return HttpResponse
+     * @return SymfonyResponse
      * @throws ServiceApiException
      * @throws Throwable
      */
-    public function provideApi(): HttpResponse
+    public function provideApi(): SymfonyResponse
     {
         if ($this->getMiddleware()) {
             $response = (new Pipeline())

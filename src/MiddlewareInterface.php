@@ -4,7 +4,7 @@ namespace Procket\Framework;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 interface MiddlewareInterface
 {
@@ -14,7 +14,7 @@ interface MiddlewareInterface
      * To pass the request deeper into the application,
      * you should call and return the ***$next*** callback with the ***$request***.
      *
-     * @param Closure(Request $request): Response $next
+     * @param Closure(Request): (SymfonyResponse) $next
      */
-    public function handle(Request $request, Closure $next): Response;
+    public function handle(Request $request, Closure $next): SymfonyResponse;
 }

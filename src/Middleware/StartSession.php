@@ -4,7 +4,6 @@ namespace Procket\Framework\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Session\FileSessionHandler;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Carbon;
@@ -13,6 +12,7 @@ use InvalidArgumentException;
 use Procket\Framework\MiddlewareInterface;
 use Random\RandomException;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class StartSession implements MiddlewareInterface
 {
@@ -20,7 +20,7 @@ class StartSession implements MiddlewareInterface
      * @inheritDoc
      * @throws RandomException
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next): SymfonyResponse
     {
         $request = $this->attachSession($request);
 
@@ -99,10 +99,10 @@ class StartSession implements MiddlewareInterface
      * Add session cookie to the response and save the session
      *
      * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param SymfonyResponse $response
+     * @return SymfonyResponse
      */
-    protected function handleSession(Request $request, Response $response): Response
+    protected function handleSession(Request $request, SymfonyResponse $response): SymfonyResponse
     {
         $config = $this->getSessionConfig();
         if (!$config['enable'] || !$request->hasSession()) {
