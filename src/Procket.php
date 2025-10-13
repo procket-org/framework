@@ -974,6 +974,10 @@ class Procket
      */
     public function makeHttpResponse(mixed $content = '', int $status = 200, array $headers = []): HttpResponse
     {
+        if ($content instanceof stdClass) {
+            $content = (array)$content;
+        }
+
         return new HttpResponse($content, $status, $headers);
     }
 
@@ -1810,64 +1814,50 @@ class Procket
     }
 
     /**
-     * Create a response instance from the given content
-     *
-     * @param mixed $content
-     * @return SymfonyResponse
-     */
-    public function toResponse(mixed $content): SymfonyResponse
-    {
-        if ($content instanceof SymfonyResponse) {
-            $response = $content;
-        } else if ($content instanceof stdClass) {
-            $response = $this->makeHttpResponse((array)$content);
-        } else {
-            $response = $this->makeHttpResponse($content);
-        }
-
-        if ($response->getStatusCode() === SymfonyResponse::HTTP_NOT_MODIFIED) {
-            $response->setNotModified();
-        }
-
-        return $response;
-    }
-
-    /**
-     * Provide API HTTP Response content
-     *
-     * @return SymfonyResponse
-     * @throws ServiceApiException
-     * @throws Throwable
-     */
-    public function provideApi(): SymfonyResponse
-    {
-        if ($this->getMiddleware()) {
-            $response = (new Pipeline())
-                ->send($this->getHttpRequest())
-                ->through($this->getMiddleware())
-                ->then(function () {
-                    return $this->toResponse($this->callServiceApi());
-                });
-        } else {
-            $response = $this->toResponse($this->callServiceApi());
-        }
-
-        return $response;
-    }
-
-    /**
-     * Start the app
+     * Start the web application
      *
      * @return void
      */
     public function run(): void
     {
         try {
-            $this->provideApi()->send();
+            $buildResponse = function () {
+                $content = $this->callServiceApi();
+                if ($content instanceof SymfonyResponse) {
+                    $response = $content;
+                } else {
+                    $response = $this->makeHttpResponse($content);
+                }
+                if ($response->getStatusCode() === SymfonyResponse::HTTP_NOT_MODIFIED) {
+                    $response->setNotModified();
+                }
+                return $response;
+            };
+            if ($this->getMiddleware()) {
+                $response = (new Pipeline())
+                    ->send($this->getHttpRequest())
+                    ->through($this->getMiddleware())
+                    ->then(function () use (&$buildResponse) {
+                        try {
+                            return $buildResponse();
+                        } catch (ServiceApiException $e) {
+                            return $this->makeHttpResponse($e->getMessage(), $e->getCode());
+                        } catch (Throwable $e) {
+                            if ($this->debug()) {
+                                $httpMsg = (string)$e;
+                            } else {
+                                $httpMsg = 'An error occurred while calling the service API';
+                                $this->getLogger()->error((string)$e);
+                            }
+                            return $this->makeHttpResponse($httpMsg, 500);
+                        }
+                    });
+            } else {
+                $response = $buildResponse();
+            }
+            $response->send();
         } catch (ServiceApiException $e) {
-            $httpMsg = $e->getMessage();
-            $httpStatus = $e->getCode();
-            $this->makeHttpResponse($httpMsg, $httpStatus)->send();
+            $this->makeHttpResponse($e->getMessage(), $e->getCode())->send();
         } catch (Throwable $e) {
             if ($this->debug()) {
                 $httpMsg = (string)$e;
@@ -1906,7 +1896,7 @@ class Procket
     }
 
     /**
-     * Call the service API directly
+     * Call the service API directly without HTTP request
      *
      * @param string|null $route The route string, obtained from request parameters by default
      * @param array|null $params Action parameters, obtained from request parameters by default
