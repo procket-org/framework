@@ -186,6 +186,20 @@ class Procket
     public string $redisLockConnection = 'lock';
 
     /**
+     * Session driver
+     *
+     * Supported drivers: "file", "redis"
+     * @var string
+     */
+    public string $sessionDriver = 'file';
+
+    /**
+     * Redis session connection name
+     * @var string
+     */
+    public string $redisSessionConnection = 'session';
+
+    /**
      * Twig template engine options
      * @var array|null
      */
@@ -1115,7 +1129,7 @@ class Procket
                         'prefix' => 'procket_database:'
                     ]
                 ],
-                'cache' => [
+                $this->redisCacheConnection => [
                     'parameters' => [
                         'host' => env('REDIS_HOST', '127.0.0.1'),
                         'port' => env('REDIS_PORT', '6379'),
@@ -1127,7 +1141,7 @@ class Procket
                         'prefix' => 'procket_cache:'
                     ]
                 ],
-                'lock' => [
+                $this->redisLockConnection => [
                     'parameters' => [
                         'host' => env('REDIS_HOST', '127.0.0.1'),
                         'port' => env('REDIS_PORT', '6379'),
@@ -1137,6 +1151,18 @@ class Procket
                     ],
                     'options' => [
                         'prefix' => 'procket_lock:'
+                    ]
+                ],
+                $this->redisSessionConnection => [
+                    'parameters' => [
+                        'host' => env('REDIS_HOST', '127.0.0.1'),
+                        'port' => env('REDIS_PORT', '6379'),
+                        'username' => env('REDIS_USERNAME'),
+                        'password' => env('REDIS_PASSWORD'),
+                        'database' => env('REDIS_SESSION_DB', '3'),
+                    ],
+                    'options' => [
+                        'prefix' => 'procket_session:'
                     ]
                 ]
             ];

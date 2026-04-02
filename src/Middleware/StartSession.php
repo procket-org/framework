@@ -11,8 +11,10 @@ use Illuminate\Support\Facades\Date;
 use InvalidArgumentException;
 use Procket\Framework\MiddlewareInterface;
 use Random\RandomException;
+use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
 class StartSession implements MiddlewareInterface
 {
@@ -38,11 +40,13 @@ class StartSession implements MiddlewareInterface
     {
         return array_replace([
             'enable' => true,
+            'driver' => procket()->sessionDriver,
             'lifetime' => env('SESSION_LIFETIME', 120),
             'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
             'files' => SESSIONS_PATH,
             'lottery' => [2, 100],
             'cookie' => env('SESSION_COOKIE', 'APP_SESSION_ID'),
+            'connection' => procket()->redisSessionConnection,
             'path' => env('SESSION_PATH', '/'),
             'domain' => env('SESSION_DOMAIN'),
             'secure' => env('SESSION_SECURE_COOKIE'),
@@ -50,6 +54,45 @@ class StartSession implements MiddlewareInterface
             'same_site' => env('SESSION_SAME_SITE', 'lax'),
             'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
         ], (array)config('session'));
+    }
+
+    /**
+     * Create session handler by configured driver
+     *
+     * @param array $config
+     * @return SessionHandlerInterface
+     */
+    protected function createSessionHandler(array $config): SessionHandlerInterface
+    {
+        if ($config['driver'] === 'file') {
+            if (!ensure_directory($config['files'])) {
+                throw new InvalidArgumentException(sprintf(
+                    "The directory for session path '%s' does not exist and failed to create",
+                    $config['files']
+                ));
+            }
+
+            return new FileSessionHandler(
+                filesystem(),
+                $config['files'],
+                $config['lifetime']
+            );
+        }
+
+        if ($config['driver'] === 'redis') {
+            return new RedisSessionHandler(
+                redis($config['connection']),
+                [
+                    'prefix' => '',
+                    'ttl' => $config['lifetime'] * 60,
+                ]
+            );
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            "Unsupported session driver '%s'",
+            $config['driver']
+        ));
     }
 
 
@@ -67,20 +110,9 @@ class StartSession implements MiddlewareInterface
             return $request;
         }
 
-        if (!ensure_directory($config['files'])) {
-            throw new InvalidArgumentException(sprintf(
-                "The directory for session path '%s' does not exist and failed to create",
-                $config['files']
-            ));
-        }
-
         $session = new SessionStore(
             $config['cookie'],
-            new FileSessionHandler(
-                filesystem(),
-                $config['files'],
-                $config['lifetime']
-            )
+            $this->createSessionHandler($config)
         );
         $session->setId($request->cookies->get($session->getName()));
         $session->setRequestOnHandler($request);
