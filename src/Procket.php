@@ -22,6 +22,8 @@ use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Session\FileSessionHandler;
+use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
@@ -42,6 +44,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use RuntimeException;
+use SessionHandlerInterface;
 use stdClass;
 use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
@@ -55,6 +58,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\SharedLockInterface;
@@ -976,6 +980,70 @@ class Procket
     public function getHttpSession(): Session
     {
         return $this->getHttpRequest()->session();
+    }
+
+    /**
+     * Get the session configuration
+     *
+     * @return array
+     */
+    public function getSessionConfig(): array
+    {
+        return array_replace([
+            'enable' => true,
+            'driver' => $this->sessionDriver,
+            'lifetime' => env('SESSION_LIFETIME', 120),
+            'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
+            'files' => SESSIONS_PATH,
+            'lottery' => [2, 100],
+            'cookie' => env('SESSION_COOKIE', 'APP_SESSION_ID'),
+            'connection' => $this->redisSessionConnection,
+            'path' => env('SESSION_PATH', '/'),
+            'domain' => env('SESSION_DOMAIN'),
+            'secure' => env('SESSION_SECURE_COOKIE'),
+            'http_only' => env('SESSION_HTTP_ONLY', true),
+            'same_site' => env('SESSION_SAME_SITE', 'lax'),
+            'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
+        ], (array)$this->getConfig('session'));
+    }
+
+    /**
+     * Get session store
+     *
+     * @return SessionStore
+     */
+    public function getSessionStore(): SessionStore
+    {
+        $config = $this->getSessionConfig();
+
+        if ($config['driver'] === 'file') {
+            if (!ensure_directory($config['files'])) {
+                throw new InvalidArgumentException(sprintf(
+                    "The directory for session path '%s' does not exist and failed to create",
+                    $config['files']
+                ));
+            }
+            $sessionHandler = new FileSessionHandler(
+                $this->getFilesystem(),
+                $config['files'],
+                $config['lifetime']
+            );
+        } else if ($config['driver'] === 'redis') {
+            $sessionHandler = new RedisSessionHandler(
+                $this->getRedis($config['connection']),
+                [
+                    'prefix' => '',
+                    'ttl' => $config['lifetime'] * 60,
+                ]
+            );
+        } else {
+            throw new InvalidArgumentException(sprintf(
+                "Unsupported session driver '%s'",
+                $config['driver']
+            ));
+        }
+
+        return new SessionStore($config['cookie'], $sessionHandler);
     }
 
     /**
